@@ -24,11 +24,11 @@ CRGB leds[numOfL];
 void setup() {
   pinMode(13, OUTPUT);
   FastLED.addLeds<WS2812B, controlPin, GRB>(leds, numOfL);
+  rainbow_start();
 }
 
 
 void loop() {
-  rainbow_start();
   rainbow_onecycle();
 }
 
