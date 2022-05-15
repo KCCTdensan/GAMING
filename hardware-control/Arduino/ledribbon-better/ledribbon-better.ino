@@ -14,6 +14,9 @@ const int controlPin = 5;
 //Definition of angular velocity
 const int anv=7;
 
+//argument for the delay function of the control because of its speedup.
+const byte delaySeconds=50;
+
 //Declaration of current corner position (to be modified)
 int nowAngle=0;
 
@@ -75,6 +78,7 @@ void rainbow_onecycle(){
   }
   nowAngle+=anv;
   if(nowAngle>134)nowAngle%=135;
+  delay(delaySeconds);
   
   FastLED.show();
   return;
