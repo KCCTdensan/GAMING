@@ -24,7 +24,7 @@ int main(){
 void rainbowcalc(int s){
 	long double rng=s/3;
 
-	for(int theta=0;theta<rng;theta++){
+	for(int theta=0;theta<=rng;theta++){
 		int waveform=128 - (127 * cos(2.0 * M_PI * ((long double)theta / rng)) );
 		nu.push_back(waveform);
 	}
@@ -35,6 +35,6 @@ void outputrainbow(int s){
 	for(int i=0;i<(s/3)-1;i++){
 		cout << nu[i] << " , ";
 	}
-	cout << nu[s/3];
+	cout << nu[s/3] << endl;
 	return;
 }
