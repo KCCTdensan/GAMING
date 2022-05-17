@@ -12,10 +12,10 @@ const int numOfL = 32;
 const int controlPin = 5;
 
 //Definition of angular velocity
-const int anv=7;
+int anv=7;
 
 //argument for the delay function of the control because of its speedup.
-const byte delaySeconds=50;
+byte delaySeconds=50;
 
 //Declaration of current corner position (to be modified)
 int nowAngle=0;
@@ -25,6 +25,7 @@ int nowAngle=0;
 CRGB leds[numOfL];
 
 void setup() {
+  Serial.begin(115200);
   pinMode(13, OUTPUT);
   FastLED.addLeds<WS2812B, controlPin, GRB>(leds, numOfL);
   rainbow_start();
@@ -32,6 +33,36 @@ void setup() {
 
 
 void loop() {
+  rainbow_cycle();
+}
+
+void command(){
+  switch(Serial.read()){
+    case 't':
+    anv = compArg();
+    break;
+    default:
+    break;
+  }
+  return;
+}
+
+int compArg(){
+  Serial.read();
+  int i=0,o=0;
+  
+  while(Serial.peek()!=10){
+    i=Serial.read()-'0';
+    o=i+o*10;;
+  }
+  Serial.read();
+  Serial.println(o);
+
+  return o;
+}
+
+void rainbow_cycle(){
+  if(Serial.available()>0)command();
   rainbow_onecycle();
 }
 
