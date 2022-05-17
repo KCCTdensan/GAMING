@@ -28,7 +28,6 @@ void setup() {
   Serial.begin(115200);
   pinMode(13, OUTPUT);
   FastLED.addLeds<WS2812B, controlPin, GRB>(leds, numOfL);
-  rainbow_start();
 }
 void(* resetFunc)(void) = 0;
 
@@ -36,23 +35,32 @@ void loop() {
   rainbow_cycle();
 }
 
-void command() {
+void system_command() {
   switch (Serial.read()) {
-    case 't':
-      Serial.println("t: edit Angular velocity");
-      anv = compArg();
+    case 'a':
+      Serial.println("a: edit Angular velocity");
+      anv = system_compArg();
       break;
     case 'd':
       Serial.println("d: edit 1Cycle delaylMilliSeconds");
-      delaySeconds = compArg();
+      delaySeconds = system_compArg();
       break;
     case 'D':
       Serial.println("D: Displays all variables");
       system_disp();
       break;
+    case 'S':
+      system_cutoff();
+      while (Serial.available() == 0) {
+        Serial.read();
+      }
+      Serial.println("S: The system operation is now temporarily suspended. To resume, enter S again. In this state, no commands other than S will be accepted.");
+      while (Serial.read() != 'S') {}
+      Serial.println("S: Resume system operation.");
+      break;
     case 'R':
-      Serial.println("R: Reset board.\n");
-      delay(2);
+      Serial.println("R: System reset.\n");
+      Serial.flush();
       resetFunc();
       break;
     default:
@@ -62,7 +70,7 @@ void command() {
   return;
 }
 
-int compArg() {
+int system_compArg() {
   Serial.read();//Blank space removal
   int i = 0, o = 0;
 
@@ -78,7 +86,7 @@ int compArg() {
   return o;
 }
 
-void system_disp(){
+void system_disp() {
   Serial.print("Angular velocity val: ");
   Serial.println(anv);
   Serial.print("1Cycle delayMilliSeconds val: ");
@@ -86,32 +94,41 @@ void system_disp(){
   Serial.println("All vals are displayed.\n");
 }
 
+void system_cutoff() {
+  for (int i = 0; i < numOfL; i++) {
+    leds[i].r = 0;
+    leds[i].g = 0;
+    leds[i].b = 0;
+  }
+  FastLED.show();
+}
+
 void rainbow_cycle() {
-  if (Serial.available() > 0)command();
+  if (Serial.available() > 0)system_command();
   rainbow_onecycle();
 }
 
-void rainbow_start() {
-  for (int nowL = 0; nowL < numOfL; nowL++) {
-    if (nowAngle < 45) {
-      leds[nowL].r = wave[nowAngle % 45 + 45];
-      leds[nowL].g = wave[nowAngle % 45];
-      leds[nowL].b = wave[0];
-    } else if (nowAngle < 90) {
-      leds[nowL].r = wave[0];
-      leds[nowL].g = wave[nowAngle % 45 + 45];
-      leds[nowL].b = wave[nowAngle % 45];
-    } else {
-      leds[nowL].r = wave[nowAngle % 45];
-      leds[nowL].g = wave[0];
-      leds[nowL].b = wave[nowAngle % 45 + 45];
-    }
-    nowAngle += anv;
-    if (nowAngle > 134)nowAngle %= 135;
-  }
-  FastLED.show();
-  return;
-}
+//void rainbow_start() {
+//  for (int nowL = 0; nowL < numOfL; nowL++) {
+//    if (nowAngle < 45) {
+//      leds[nowL].r = wave[nowAngle % 45 + 45];
+//      leds[nowL].g = wave[nowAngle % 45];
+//      leds[nowL].b = wave[0];
+//    } else if (nowAngle < 90) {
+//      leds[nowL].r = wave[0];
+//      leds[nowL].g = wave[nowAngle % 45 + 45];
+//      leds[nowL].b = wave[nowAngle % 45];
+//    } else {
+//      leds[nowL].r = wave[nowAngle % 45];
+//      leds[nowL].g = wave[0];
+//      leds[nowL].b = wave[nowAngle % 45 + 45];
+//    }
+//    nowAngle += anv;
+//    if (nowAngle > 134)nowAngle %= 135;
+//  }
+//  FastLED.show();
+//  return;
+//}
 
 void rainbow_onecycle() {
   for (int i = numOfL - 1; i > 0; i--) {
