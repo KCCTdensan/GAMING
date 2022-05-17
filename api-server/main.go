@@ -32,12 +32,10 @@ func init() { flag.Parse() }
 
 func init() {
 	var err error
-
 	c := &serial.Config{
 		Name: *Dev,
 		Baud: *Baud,
 	}
-
 	Serial, err = serial.OpenPort(c)
 	if err != nil {
 		panic(err.Error())
@@ -51,9 +49,7 @@ func main() {
 	// serial
 	go func() {
 		defer Serial.Close()
-
 		b := make([]byte, 128)
-
 		for {
 			n, err := Serial.Read(b)
 			if err == io.EOF {
@@ -62,7 +58,6 @@ func main() {
 			if err != nil {
 				panic(err.Error())
 			}
-
 			if a := strings.Split(string(b[:n]), ","); len(a) == 2 {
 				Conf.Brightness, _ = strconv.Atoi(a[0])
 				Conf.Speed, _ = strconv.Atoi(a[1])
