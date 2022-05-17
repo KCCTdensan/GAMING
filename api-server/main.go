@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -15,12 +16,26 @@ import (
 var (
 	Addr = flag.String("addr", ":8080", "listen address")
 	Dev  = flag.String("dev", "/dev/ttyUSB0", "serial device")
-	Baud = flag.Int("baud", 9600, "serial baud rate")
+	Baud = flag.Int("baud", 115200, "serial baud rate")
 )
 
 type Config struct {
-	Brightness int
-	Speed      int
+	Angle int
+	Delay int
+}
+
+func listenSerial(s *serial.Port, c chan string) {
+	b := make([]byte, 128)
+	for {
+		n, err := s.Read(b)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			panic(err.Error())
+		}
+		c <- string(b[:n])
+	}
 }
 
 func init() { flag.Parse() }
@@ -39,66 +54,64 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-	ch := make(chan Config)
+	defer s.Close()
+	ch := make(chan string)
 	go listenSerial(s, ch)
+	go func() {
+		// 仮
+		for s := range ch {
+			if a := strings.Split(s, ","); len(a) == 2 {
+				v0, err := strconv.Atoi(a[0])
+				if err != nil {
+					continue
+				}
+				v1, err := strconv.Atoi(a[1])
+				if err != nil {
+					continue
+				}
+				conf = Config{v0, v1}
+			}
+		}
+	}()
 
 	// http
 	r := gin.New()
 
-	r.POST("/brightness", func(c *gin.Context) {
-		s := c.PostForm("val")
-		v, err := strconv.Atoi(s)
+	r.POST("/angle", func(c *gin.Context) {
+		v := c.PostForm("val")
+		n, err := strconv.Atoi(v)
 		if err != nil {
 			c.Status(http.StatusBadRequest)
 			return
 		}
-		conf.Brightness = v
-		log.Print("new brightness val: ", v)
+		conf.Angle = n
+		s.Write([]byte(fmt.Sprintf("a %d", n)))
+		log.Print("new brightness val: ", n)
 	})
 
-	r.GET("/brightness", func(c *gin.Context) {
-		c.String(http.StatusOK, strconv.Itoa(conf.Brightness))
+	r.GET("/angle", func(c *gin.Context) {
+		c.String(http.StatusOK, strconv.Itoa(conf.Angle))
 	})
 
-	r.POST("/speed", func(c *gin.Context) {
-		s := c.PostForm("val")
-		v, err := strconv.Atoi(s)
+	r.POST("/delay", func(c *gin.Context) {
+		v := c.PostForm("val")
+		n, err := strconv.Atoi(v)
 		if err != nil {
 			c.Status(http.StatusBadRequest)
 			return
 		}
-		conf.Speed = v
-		log.Print("new speed val: ", v)
+		conf.Delay = n
+		s.Write([]byte(fmt.Sprintf("d %d", n)))
+		log.Print("new delay val: ", n)
 	})
 
-	r.GET("/speed", func(c *gin.Context) {
-		c.String(http.StatusOK, strconv.Itoa(conf.Speed))
+	r.GET("/delay", func(c *gin.Context) {
+		c.String(http.StatusOK, strconv.Itoa(conf.Delay))
+	})
+
+	r.POST("/reset", func(c *gin.Context) {
+		s.Write([]byte("R"))
 	})
 
 	r.Run(*Addr)
-}
-
-func listenSerial(s *serial.Port, c chan Config) {
-	defer s.Close()
-	b := make([]byte, 128)
-	for {
-		n, err := s.Read(b)
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			panic(err.Error())
-		}
-		if a := strings.Split(string(b[:n]), ","); len(a) == 2 {
-			brightness, err := strconv.Atoi(a[0])
-			if err != nil {
-				continue
-			}
-			speed, err := strconv.Atoi(a[1])
-			if err != nil {
-				continue
-			}
-			c <- Config{brightness, speed}
-		}
-	}
 }
