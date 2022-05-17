@@ -30,9 +30,10 @@ void setup() {
   FastLED.addLeds<WS2812B, controlPin, GRB>(leds, numOfL);
 }
 void(* resetFunc)(void) = 0;
+void(*brightFunc)(void) = rainbow_cycle;
 
 void loop() {
-  rainbow_cycle();
+  brightFunc();
 }
 
 void system_command() {
@@ -45,6 +46,10 @@ void system_command() {
       Serial.println("d: edit 1Cycle delaylMilliSeconds");
       delaySeconds = system_compArg();
       break;
+    case 'c'
+        Serial.println("c: Changes to the specified light pattern.");
+      system_change(system_compArg());
+      break;
     case 'D':
       Serial.println("D: Displays all variables");
       system_disp();
@@ -56,7 +61,7 @@ void system_command() {
       }
       Serial.println("S: The system operation is now temporarily suspended. To resume, enter S again. In this state, no commands other than S will be accepted.");
       while (Serial.read() != 'S') {}
-      Serial.println("S: Resume system operation.");
+      Serial.println("S: Resume system operation.\n");
       break;
     case 'R':
       Serial.println("R: System reset.\n");
@@ -86,6 +91,20 @@ int system_compArg() {
   return o;
 }
 
+void system_change(byte type) {
+  switch (type) {
+    case 0:
+      brightFunc = rainbow_cycle;
+      Serial.println("c: The light pattern is set to GAMING.");
+      break;
+    default:
+      Serial.println("c: Error ! Non-existent specification code.");
+  }
+  Serial.println();
+
+  return;
+}
+
 void system_disp() {
   Serial.print("Angular velocity val: ");
   Serial.println(anv);
@@ -103,32 +122,11 @@ void system_cutoff() {
   FastLED.show();
 }
 
-void rainbow_cycle() {
-  if (Serial.available() > 0)system_command();
-  rainbow_onecycle();
-}
 
-//void rainbow_start() {
-//  for (int nowL = 0; nowL < numOfL; nowL++) {
-//    if (nowAngle < 45) {
-//      leds[nowL].r = wave[nowAngle % 45 + 45];
-//      leds[nowL].g = wave[nowAngle % 45];
-//      leds[nowL].b = wave[0];
-//    } else if (nowAngle < 90) {
-//      leds[nowL].r = wave[0];
-//      leds[nowL].g = wave[nowAngle % 45 + 45];
-//      leds[nowL].b = wave[nowAngle % 45];
-//    } else {
-//      leds[nowL].r = wave[nowAngle % 45];
-//      leds[nowL].g = wave[0];
-//      leds[nowL].b = wave[nowAngle % 45 + 45];
-//    }
-//    nowAngle += anv;
-//    if (nowAngle > 134)nowAngle %= 135;
-//  }
-//  FastLED.show();
-//  return;
-//}
+void system_startCycle() {
+  if (Serial.available() > 0)system_command();
+  brightFunc();
+}
 
 void rainbow_onecycle() {
   for (int i = numOfL - 1; i > 0; i--) {
