@@ -18,11 +18,6 @@ var (
 	Baud = flag.Int("baud", 9600, "serial baud rate")
 )
 
-var (
-	Serial *serial.Port
-	Conf   Config
-)
-
 type Config struct {
 	Brightness int
 	Speed      int
@@ -30,40 +25,22 @@ type Config struct {
 
 func init() { flag.Parse() }
 
-func init() {
-	var err error
+func init() { gin.SetMode(gin.ReleaseMode) }
+
+func main() {
+	var conf Config
+
+	// serial
 	c := &serial.Config{
 		Name: *Dev,
 		Baud: *Baud,
 	}
-	Serial, err = serial.OpenPort(c)
+	s, err := serial.OpenPort(c)
 	if err != nil {
 		panic(err.Error())
 	}
-}
-
-func init() { gin.SetMode(gin.ReleaseMode) }
-
-func main() {
-
-	// serial
-	go func() {
-		defer Serial.Close()
-		b := make([]byte, 128)
-		for {
-			n, err := Serial.Read(b)
-			if err == io.EOF {
-				break
-			}
-			if err != nil {
-				panic(err.Error())
-			}
-			if a := strings.Split(string(b[:n]), ","); len(a) == 2 {
-				Conf.Brightness, _ = strconv.Atoi(a[0])
-				Conf.Speed, _ = strconv.Atoi(a[1])
-			}
-		}
-	}()
+	ch := make(chan Config)
+	go listenSerial(s, ch)
 
 	// http
 	r := gin.New()
@@ -75,12 +52,12 @@ func main() {
 			c.Status(http.StatusBadRequest)
 			return
 		}
-		Conf.Brightness = v
+		conf.Brightness = v
 		log.Print("new brightness val: ", v)
 	})
 
 	r.GET("/brightness", func(c *gin.Context) {
-		c.String(http.StatusOK, strconv.Itoa(Conf.Brightness))
+		c.String(http.StatusOK, strconv.Itoa(conf.Brightness))
 	})
 
 	r.POST("/speed", func(c *gin.Context) {
@@ -90,13 +67,38 @@ func main() {
 			c.Status(http.StatusBadRequest)
 			return
 		}
-		Conf.Speed = v
+		conf.Speed = v
 		log.Print("new speed val: ", v)
 	})
 
 	r.GET("/speed", func(c *gin.Context) {
-		c.String(http.StatusOK, strconv.Itoa(Conf.Speed))
+		c.String(http.StatusOK, strconv.Itoa(conf.Speed))
 	})
 
 	r.Run(*Addr)
+}
+
+func listenSerial(s *serial.Port, c chan Config) {
+	defer s.Close()
+	b := make([]byte, 128)
+	for {
+		n, err := s.Read(b)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			panic(err.Error())
+		}
+		if a := strings.Split(string(b[:n]), ","); len(a) == 2 {
+			brightness, err := strconv.Atoi(a[0])
+			if err != nil {
+				continue
+			}
+			speed, err := strconv.Atoi(a[1])
+			if err != nil {
+				continue
+			}
+			c <- Config{brightness, speed}
+		}
+	}
 }
