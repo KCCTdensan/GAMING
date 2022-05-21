@@ -20,7 +20,7 @@ byte delaySeconds = 50;
 //Declaration of current corner position (to be modified)
 int nowAngle = 0;
 
-//debugging mode val
+//DBGugging mode val
 //#define DBG
 
 //---valSetupEnd---
@@ -42,19 +42,19 @@ void loop() {
 void system_command() {
   switch (Serial.read()) {
     case 'a':
-      sysdeb_disp("a: edit Angular velocity");
+      sysDBG_disp("a: edit Angular velocity");
       anv = system_compArg();
       break;
     case 'd':
-      sysdeb_disp("d: edit 1Cycle delaylMilliSeconds");
+      sysDBG_disp("d: edit 1Cycle delaylMilliSeconds");
       delaySeconds = system_compArg();
       break;
     case 'c':
-      sysdeb_disp("c: Changes to the specified light pattern.");
+      sysDBG_disp("c: Changes to the specified light pattern.");
       system_change(system_compArg());
       break;
     case 'D':
-      sysdeb_disp("D: Displays all variables");
+      sysDBG_disp("D: Displays all variables");
       system_disp();
       break;
     case 'S':
@@ -62,17 +62,17 @@ void system_command() {
       while (Serial.available() == 0) {
         Serial.read();
       }
-      sysdeb_disp("S: The system operation is now temporarily suspended. To resume, enter S again. In this state, no commands other than S will be accepted.");
+      sysDBG_disp("S: The system operation is now temporarily suspended. To resume, enter S again. In this state, no commands other than S will be accepted.");
       while (Serial.read() != 'S') {}
-      sysdeb_disp("S: Resume system operation.\n");
+      sysDBG_disp("S: Resume system operation.\n");
       break;
     case 'R':
-      sysdeb_disp("R: System reset.\n");
+      sysDBG_disp("R: System reset.\n");
       Serial.flush();
       resetFunc();
       break;
     default:
-      sysdeb_disp("Command not found.\n");
+      sysDBG_disp("Command not found.\n");
       break;
   }
   system_cleanBuf();
@@ -86,12 +86,12 @@ int system_compArg() {
 
   while (Serial.peek() != 10 && Serial.peek() != -1) {
     i = Serial.read() - '0';
-    o = i + o * 10;;
+    o = i + o * 10;
   }
 
-  sysdeb_disp("Set val: ");
-  sysdeb_dispval(o);
-  sysdeb_disp("");
+  sysDBG_disp("Set val: ");
+  sysDBG_dispval(o);
+  sysDBG_disp("");
   return o;
 }
 
@@ -99,43 +99,43 @@ void system_change(byte type) {
   switch (type) {
     case 0:
       brightFunc = rainbow_onecycle;
-      sysdeb_disp("c: The light pattern is set to GAMING.");
+      sysDBG_disp("c: The light pattern is set to GAMING.");
       break;
     case 1:
       brightFunc = white_onecycle;
-      sysdeb_disp("c: The light pattern is set to white.");
+      sysDBG_disp("c: The light pattern is set to white.");
       break;
     case 2:
       brightFunc = daylight_onecycle;
-      sysdeb_disp("c: The light pattern is set to daylight white.");
+      sysDBG_disp("c: The light pattern is set to daylight white.");
       break;
     case 3:
       brightFunc = subdued_onecycle;
-      sysdeb_disp("c: The light pattern is set to subdued white.");
+      sysDBG_disp("c: The light pattern is set to subdued white.");
       break;
     case 4:
       brightFunc = sepia_onecycle;
-      sysdeb_disp("c: The light pattern is set to sepia.");
+      sysDBG_disp("c: The light pattern is set to sepia.");
       break;
     case 5:
       brightFunc = redwave_onecycle;
-      sysdeb_disp("c: The light pattern is set to REDWAVE.");
+      sysDBG_disp("c: The light pattern is set to REDWAVE.");
       break;
     default:
-      sysdeb_disp("c: Error ! Non-existent specification code.");
+      sysDBG_disp("c: Error ! Non-existent specification code.");
   }
-  sysdeb_disp("");
+  sysDBG_disp("");
 
   return;
 }
 
 void system_disp() {
-#ifdef DEB
-  sysdeb_disp("Angular velocity val: ");
-  sysdeb_dispval(anv);
-  sysdeb_disp("1Cycle delayMilliSeconds val: ");
-  sysdeb_dispval(delaySeconds);
-  sysdeb_disp("All vals are displayed.\n");
+#ifdef DBG
+  sysDBG_disp("Angular velocity val: ");
+  sysDBG_dispval(anv);
+  sysDBG_disp("1Cycle delayMilliSeconds val: ");
+  sysDBG_dispval(delaySeconds);
+  sysDBG_disp("All vals are displayed.\n");
 #else
   Serial.print(anv);
   Serial.print(" ");
@@ -174,14 +174,14 @@ void system_startCycle() {
   brightFunc();
 }
 
-void sysdeb_disp(String str) {
-#ifdef DEB
+void sysDBG_disp(String str) {
+#ifdef DBG
   Serial.println(str);
 #endif
 }
 
-void sysdeb_dispval(int val) {
-#ifdef DEB
+void sysDBG_dispval(int val) {
+#ifdef DBG
   Serial.print(val);
 #endif
 }
