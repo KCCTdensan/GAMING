@@ -20,7 +20,7 @@ byte delaySeconds = 50;
 //Declaration of current corner position (to be modified)
 int nowAngle = 0;
 
-//DBGugging mode val
+//dbgugging mode val
 //#define DBG
 
 //---valSetupEnd---
@@ -42,19 +42,19 @@ void loop() {
 void system_command() {
   switch (Serial.read()) {
     case 'a':
-      sysDBG_disp("a: edit Angular velocity");
+      sysdbg_disp("a: edit Angular velocity");
       anv = system_compArg();
       break;
     case 'd':
-      sysDBG_disp("d: edit 1Cycle delaylMilliSeconds");
+      sysdbg_disp("d: edit 1Cycle delaylMilliSeconds");
       delaySeconds = system_compArg();
       break;
     case 'c':
-      sysDBG_disp("c: Changes to the specified light pattern.");
+      sysdbg_disp("c: Changes to the specified light pattern.");
       system_change(system_compArg());
       break;
     case 'D':
-      sysDBG_disp("D: Displays all variables");
+      sysdbg_disp("D: Displays all variables");
       system_disp();
       break;
     case 'S':
@@ -62,17 +62,17 @@ void system_command() {
       while (Serial.available() == 0) {
         Serial.read();
       }
-      sysDBG_disp("S: The system operation is now temporarily suspended. To resume, enter S again. In this state, no commands other than S will be accepted.");
+      sysdbg_disp("S: The system operation is now temporarily suspended. To resume, enter S again. In this state, no commands other than S will be accepted.");
       while (Serial.read() != 'S') {}
-      sysDBG_disp("S: Resume system operation.\n");
+      sysdbg_disp("S: Resume system operation.\n");
       break;
     case 'R':
-      sysDBG_disp("R: System reset.\n");
+      sysdbg_disp("R: System reset.\n");
       Serial.flush();
       resetFunc();
       break;
     default:
-      sysDBG_disp("Command not found.\n");
+      sysdbg_disp("Command not found.\n");
       break;
   }
   system_cleanBuf();
@@ -89,9 +89,9 @@ int system_compArg() {
     o = i + o * 10;
   }
 
-  sysDBG_disp("Set val: ");
-  sysDBG_dispval(o);
-  sysDBG_disp("");
+  sysdbg_disp("Set val: ");
+  sysdbg_dispval(o);
+  sysdbg_disp("");
   return o;
 }
 
@@ -99,43 +99,43 @@ void system_change(byte type) {
   switch (type) {
     case 0:
       brightFunc = rainbow_onecycle;
-      sysDBG_disp("c: The light pattern is set to GAMING.");
+      sysdbg_disp("c: The light pattern is set to GAMING.");
       break;
     case 1:
       brightFunc = white_onecycle;
-      sysDBG_disp("c: The light pattern is set to white.");
+      sysdbg_disp("c: The light pattern is set to white.");
       break;
     case 2:
       brightFunc = daylight_onecycle;
-      sysDBG_disp("c: The light pattern is set to daylight white.");
+      sysdbg_disp("c: The light pattern is set to daylight white.");
       break;
     case 3:
       brightFunc = subdued_onecycle;
-      sysDBG_disp("c: The light pattern is set to subdued white.");
+      sysdbg_disp("c: The light pattern is set to subdued white.");
       break;
     case 4:
       brightFunc = sepia_onecycle;
-      sysDBG_disp("c: The light pattern is set to sepia.");
+      sysdbg_disp("c: The light pattern is set to sepia.");
       break;
     case 5:
       brightFunc = redwave_onecycle;
-      sysDBG_disp("c: The light pattern is set to REDWAVE.");
+      sysdbg_disp("c: The light pattern is set to REDWAVE.");
       break;
     default:
-      sysDBG_disp("c: Error ! Non-existent specification code.");
+      sysdbg_disp("c: Error ! Non-existent specification code.");
   }
-  sysDBG_disp("");
+  sysdbg_disp("");
 
   return;
 }
 
 void system_disp() {
 #ifdef DBG
-  sysDBG_disp("Angular velocity val: ");
-  sysDBG_dispval(anv);
-  sysDBG_disp("1Cycle delayMilliSeconds val: ");
-  sysDBG_dispval(delaySeconds);
-  sysDBG_disp("All vals are displayed.\n");
+  sysdbg_disp("Angular velocity val: ");
+  sysdbg_dispval(anv);
+  sysdbg_disp("1Cycle delayMilliSeconds val: ");
+  sysdbg_dispval(delaySeconds);
+  sysdbg_disp("All vals are displayed.\n");
 #else
   Serial.print(anv);
   Serial.print(",");
@@ -174,13 +174,13 @@ void system_startCycle() {
   brightFunc();
 }
 
-void sysDBG_disp(String str) {
+void sysdbg_disp(String str) {
 #ifdef DBG
   Serial.println(str);
 #endif
 }
 
-void sysDBG_dispval(int val) {
+void sysdbg_dispval(int val) {
 #ifdef DBG
   Serial.print(val);
 #endif
