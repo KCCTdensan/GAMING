@@ -138,7 +138,7 @@ void system_disp() {
   sysDBG_disp("All vals are displayed.\n");
 #else
   Serial.print(anv);
-  Serial.print(" ");
+  Serial.print(",");
   Serial.print(delaySeconds);
   Serial.println();
 #endif
