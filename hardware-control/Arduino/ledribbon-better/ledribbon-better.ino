@@ -75,6 +75,8 @@ void system_command() {
       sysdeb_disp("Command not found.\n");
       break;
   }
+  system_cleanBuf();
+
   return;
 }
 
@@ -86,7 +88,6 @@ int system_compArg() {
     i = Serial.read() - '0';
     o = i + o * 10;;
   }
-  Serial.read();//null code removal
 
   sysdeb_disp("Set val: ");
   sysdeb_dispval(o);
@@ -141,6 +142,14 @@ void system_disp() {
   Serial.print(delaySeconds);
   Serial.println();
 #endif
+}
+
+void system_cleanBuf() {
+  while (Serial.peek() != -1) {
+    Serial.read();
+  }
+
+  return;
 }
 
 void system_cutoff() {
