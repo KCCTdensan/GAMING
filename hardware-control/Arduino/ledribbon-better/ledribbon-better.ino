@@ -109,11 +109,18 @@ void system_change(byte type) {
 }
 
 void system_disp() {
+  #ifdef DEB
   sysdeb_disp("Angular velocity val: ");
   sysdeb_dispval(anv);
   sysdeb_disp("1Cycle delayMilliSeconds val: ");
   sysdeb_dispval(delaySeconds);
   sysdeb_disp("All vals are displayed.\n");
+  #else
+  Serial.print(anv);
+  Serial.print(" ");
+  Serial.print(delaySeconds);
+  Serial.println();
+  #endif
 }
 
 void system_cutoff() {
