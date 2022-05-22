@@ -129,6 +129,14 @@ void system_change(byte type) {
       brightFunc = ocean_onecycle;
       sysdbg_disp("c: The light pattern is set to OCEAN.");
       break;
+    case 8:
+      brightFunc = random_onecycle;
+      sysdbg_disp("c: The light pattern is set to RANDOM.");
+      break;
+    case 9:
+      brightFunc = communism_onecycle;
+      sysdbg_disp("c: The light pattern is set to COMMUNISM.");
+      break;
     default:
       sysdbg_disp("c: Error ! Non-existent specification code.");
   }
@@ -295,6 +303,37 @@ void ocean_onecycle(){
   leds[0].r = wave[0];
   leds[0].g = wave[nowAngle];
   leds[0].b = wave[24];
+  nowAngle += anv;
+  delay(delaySeconds);
+
+  FastLED.show();
+  return;
+}
+
+void random_onecycle(){
+  system_shiftColors();
+  randomSeed(analogRead(A0));
+  leds[0].r = wave[random(0,256)];
+  leds[0].g = wave[random(0,256)];
+  leds[0].b = wave[random(0,256)];
+  delay(delaySeconds);
+
+  FastLED.show();
+  return;
+}
+
+void communism_onecycle() {
+  system_shiftColors();
+  if (nowAngle > 180)nowAngle %= 180;
+  if(nowAngle<90){
+    leds[0].r = wave[45];
+    leds[0].g = wave[nowAngle];
+    leds[0].b = wave[0];
+  }else{
+    leds[0].r = wave[45];
+    leds[0].g = wave[0];
+    leds[0].b = wave[0];
+  }
   nowAngle += anv;
   delay(delaySeconds);
 
