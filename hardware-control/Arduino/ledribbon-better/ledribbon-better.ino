@@ -121,6 +121,14 @@ void system_change(byte type) {
       brightFunc = redwave_onecycle;
       sysdbg_disp("c: The light pattern is set to REDWAVE.");
       break;
+    case 6:
+      brightFunc = blueshot_onecycle;
+      sysdbg_disp("c: The light pattern is set to BLUESHOT.");
+      break;
+    case 7:
+      brightFunc = ocean_onecycle;
+      sysdbg_disp("c: The light pattern is set to OCEAN.");
+      break;
     default:
       sysdbg_disp("c: Error ! Non-existent specification code.");
   }
@@ -255,6 +263,38 @@ void redwave_onecycle() {
   leds[0].r = wave[nowAngle];
   leds[0].g = wave[0];
   leds[0].b = wave[0];
+  nowAngle += anv;
+  delay(delaySeconds);
+
+  FastLED.show();
+  return;
+}
+
+void blueshot_onecycle() {
+  system_shiftColors();
+  if (nowAngle > 135)nowAngle %= 135;
+  if(nowAngle<45){
+    leds[0].r = wave[0];
+    leds[0].g = wave[0];
+    leds[0].b = wave[nowAngle+45];
+  }else{
+    leds[0].r = wave[0];
+    leds[0].g = wave[0];
+    leds[0].b = wave[0];
+  }
+  nowAngle += anv;
+  delay(delaySeconds);
+
+  FastLED.show();
+  return;
+}
+
+void ocean_onecycle(){
+  system_shiftColors();
+  if (nowAngle < 24 || nowAngle > 75)nowAngle = (nowAngle%45)+24;
+  leds[0].r = wave[0];
+  leds[0].g = wave[nowAngle];
+  leds[0].b = wave[24];
   nowAngle += anv;
   delay(delaySeconds);
 
