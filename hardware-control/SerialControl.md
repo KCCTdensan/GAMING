@@ -47,7 +47,10 @@ changeの略．光り方を変える．
 | 3 | 暖色系白色 |
 | 4 | セピア |
 | 5 | REDWAVE(危険そうな光り方) |
-| 以降 | 随時追加予定 |
+| 6 | BLUESHOT |
+| 7 | OCEAN |
+| 8 | RANDOM |
+| 9 | COMMUNISM |
 
 ### Dコマンド
 
