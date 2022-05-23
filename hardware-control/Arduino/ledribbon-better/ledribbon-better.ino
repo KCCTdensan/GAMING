@@ -289,11 +289,11 @@ void redwave_onecycle() {
 void blueshot_onecycle() {
   system_shiftColors();
   if (nowAngle > 135)nowAngle %= 135;
-  if(nowAngle<45){
+  if (nowAngle < 45) {
     leds[0].r = wave[0];
     leds[0].g = wave[0];
-    leds[0].b = wave[nowAngle+45];
-  }else{
+    leds[0].b = wave[nowAngle + 45];
+  } else {
     leds[0].r = wave[0];
     leds[0].g = wave[0];
     leds[0].b = wave[0];
@@ -305,9 +305,9 @@ void blueshot_onecycle() {
   return;
 }
 
-void ocean_onecycle(){
+void ocean_onecycle() {
   system_shiftColors();
-  if (nowAngle < 24 || nowAngle > 75)nowAngle = (nowAngle%45)+24;
+  if (nowAngle < 24 || nowAngle > 75)nowAngle = (nowAngle % 45) + 24;
   leds[0].r = wave[0];
   leds[0].g = wave[nowAngle];
   leds[0].b = wave[24];
@@ -318,12 +318,15 @@ void ocean_onecycle(){
   return;
 }
 
-void random_onecycle(){
+void random_onecycle() {
   system_shiftColors();
-  randomSeed(analogRead(A0));
-  leds[0].r = wave[random(0,256)];
-  leds[0].g = wave[random(0,256)];
-  leds[0].b = wave[random(0,256)];
+  randomSeed(wave[nowAngle]);
+  leds[0].r = wave[random(0, 256)];
+  randomSeed(wave[nowAngle]);
+  leds[0].g = wave[random(0, 256)];
+  randomSeed(wave[nowAngle]);
+  leds[0].b = wave[random(0, 256)];
+  nowAngle += anv;
   delay(delaySeconds);
 
   FastLED.show();
@@ -333,11 +336,11 @@ void random_onecycle(){
 void communism_onecycle() {
   system_shiftColors();
   if (nowAngle > 180)nowAngle %= 180;
-  if(nowAngle<90){
+  if (nowAngle < 90) {
     leds[0].r = wave[45];
     leds[0].g = wave[nowAngle];
     leds[0].b = wave[0];
-  }else{
+  } else {
     leds[0].r = wave[45];
     leds[0].g = wave[0];
     leds[0].b = wave[0];
@@ -351,10 +354,12 @@ void communism_onecycle() {
 
 void pinkwave_onecycle() {
   system_shiftColors();
-  if (nowAngle > 89)nowAngle %= 90;
-  leds[0].r = wave[nowAngle];
-  leds[0].g = wave[0];
-  leds[0].b = wave[nowAngle];
+  randomSeed(analogRead(A0)%10);
+  leds[0].r = wave[random(0,256)];
+  randomSeed(analogRead(A0)%10);
+  leds[0].g = wave[random(0,256)];
+  randomSeed(analogRead(A0)%10);
+  leds[0].b = wave[random(0,256)];
   nowAngle += anv;
   delay(delaySeconds);
 
@@ -374,19 +379,19 @@ void dprk_onecycle() {
     leds[0].r = 255;
     leds[0].g = 255;
     leds[0].b = 255;
-  } else if(nowAngle < 150){
+  } else if (nowAngle < 150) {
     leds[0].r = 255;
     leds[0].g = 0;
     leds[0].b = 0;
-  }else if(nowAngle < 160){
+  } else if (nowAngle < 160) {
     leds[0].r = 255;
     leds[0].g = 255;
     leds[0].b = 255;
-  }else if(nowAngle < 200){
+  } else if (nowAngle < 200) {
     leds[0].r = 0;
     leds[0].g = 0;
     leds[0].b = 255;
-  }else{
+  } else {
     leds[0].r = 0;
     leds[0].g = 0;
     leds[0].b = 0;
