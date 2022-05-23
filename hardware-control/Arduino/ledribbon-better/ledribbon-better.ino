@@ -137,6 +137,14 @@ void system_change(byte type) {
       brightFunc = communism_onecycle;
       sysdbg_disp("c: The light pattern is set to COMMUNISM.");
       break;
+    case 10:
+      brightFunc = pinkwave_onecycle;
+      sysdbg_disp("c: The light pattern is set to PINKWAVE.");
+      break;
+    case 11:
+      brightFunc = dprk_onecycle;
+      sysdbg_disp("c: The light pattern is set to DPRK.");
+      break;
     default:
       sysdbg_disp("c: Error ! Non-existent specification code.");
   }
@@ -204,6 +212,7 @@ void sysdbg_dispval(int val) {
 
 void rainbow_onecycle() {
   system_shiftColors();
+  if (nowAngle > 134)nowAngle %= 135;
   if (nowAngle < 45) {
     leds[0].r = wave[nowAngle % 45 + 45];
     leds[0].g = wave[nowAngle % 45];
@@ -218,7 +227,6 @@ void rainbow_onecycle() {
     leds[0].b = wave[nowAngle % 45 + 45];
   }
   nowAngle += anv;
-  if (nowAngle > 134)nowAngle %= 135;
   delay(delaySeconds);
 
   FastLED.show();
@@ -333,6 +341,55 @@ void communism_onecycle() {
     leds[0].r = wave[45];
     leds[0].g = wave[0];
     leds[0].b = wave[0];
+  }
+  nowAngle += anv;
+  delay(delaySeconds);
+
+  FastLED.show();
+  return;
+}
+
+void pinkwave_onecycle() {
+  system_shiftColors();
+  if (nowAngle > 89)nowAngle %= 90;
+  leds[0].r = wave[nowAngle];
+  leds[0].g = wave[0];
+  leds[0].b = wave[nowAngle];
+  nowAngle += anv;
+  delay(delaySeconds);
+
+  FastLED.show();
+  return;
+}
+
+
+void dprk_onecycle() {
+  system_shiftColors();
+  if (nowAngle > 219)nowAngle %= 220;
+  if (nowAngle < 40) {
+    leds[0].r = 0;
+    leds[0].g = 0;
+    leds[0].b = 255;
+  } else if (nowAngle < 50) {
+    leds[0].r = 255;
+    leds[0].g = 255;
+    leds[0].b = 255;
+  } else if(nowAngle < 150){
+    leds[0].r = 255;
+    leds[0].g = 0;
+    leds[0].b = 0;
+  }else if(nowAngle < 160){
+    leds[0].r = 255;
+    leds[0].g = 255;
+    leds[0].b = 255;
+  }else if(nowAngle < 200){
+    leds[0].r = 0;
+    leds[0].g = 0;
+    leds[0].b = 255;
+  }else{
+    leds[0].r = 0;
+    leds[0].g = 0;
+    leds[0].b = 0;
   }
   nowAngle += anv;
   delay(delaySeconds);
