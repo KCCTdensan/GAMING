@@ -1,0 +1,17 @@
+{
+  "name": "web-front",
+  "version": "1.0.0",
+  "dependencies": {
+    "bulma": "0.9.4"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-node": "next",
+    "@sveltejs/kit": "next",
+    "svelte": "3.48.0"
+  },
+  "scripts": {
+    "build": "svelte-kit build",
+    "dev": "svelte-kit dev"
+  },
+  "type": "module"
+}
