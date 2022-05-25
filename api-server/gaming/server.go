@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/time/rate"
 )
 
 func init() { gin.SetMode(gin.ReleaseMode) }
@@ -16,8 +17,18 @@ type Server struct {
 	cmd    *Cmd
 }
 
+var lim = rate.NewLimiter(2.0, 1)
+
+func rateLimiter(c *gin.Context) {
+	if c.Request.Method != "GET" && !lim.Allow() {
+		c.String(http.StatusTooManyRequests, "Too Many Requests")
+		c.Abort()
+	}
+}
+
 func NewServer(addr string, status *Status, cmd *Cmd) Server {
 	router := gin.New()
+	router.Use(rateLimiter)
 	s := Server{router, addr, status, cmd}
 	s.InitRoutes()
 	return s

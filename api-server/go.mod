@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/gin-gonic/gin v1.7.7
 	github.com/tarm/serial v0.0.0-20180830185346-98f6abe2eb07
+	golang.org/x/time v0.0.0-20220411224347-583f2d630306
 )
 
 require (
