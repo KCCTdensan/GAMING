@@ -30,7 +30,7 @@ func main() {
 
 	// http
 	r := gaming.NewServer(*Addr, &status, &cmd)
-	go r.Run()
+	r.Run()
 
-	defer log.Print("shutting down...")
+	log.Print("shutting down...")
 }

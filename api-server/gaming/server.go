@@ -4,7 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gin-gonic/gin")
+	"github.com/gin-gonic/gin"
+)
 
 func init() { gin.SetMode(gin.ReleaseMode) }
 
@@ -17,10 +18,12 @@ type Server struct {
 
 func NewServer(addr string, status *Status, cmd *Cmd) Server {
 	router := gin.New()
-	return Server{router, addr, status,  cmd}
+	s := Server{router, addr, status, cmd}
+	s.InitRoutes()
+	return s
 }
 
-func (s *Server) Init() {
+func (s *Server) InitRoutes() {
 	s.router.GET("/angle", func(c *gin.Context) {
 		c.String(http.StatusOK, strconv.Itoa(s.status.Angle))
 	})

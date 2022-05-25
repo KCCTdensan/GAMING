@@ -6,11 +6,11 @@ import (
 )
 
 type Cmd struct {
-	ch   chan []byte
+	ch     chan []byte
 	status *Status // for Type
 }
 
-func NewCmd(ch chan[]byte, status *Status) Cmd {
+func NewCmd(ch chan []byte, status *Status) Cmd {
 	return Cmd{ch, status}
 }
 
