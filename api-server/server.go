@@ -48,7 +48,7 @@ func (s *Server) InitRoutes() {
 	s.router.POST("/suspend", func(c *gin.Context) {
 		err := s.cmd.Suspend()
 		if err != nil {
-			c.String(http.StatusBadRequest, "Bad Request")
+			c.String(http.StatusInternalServerError, "Internal Server Error")
 			c.Abort()
 			return
 		}
@@ -56,11 +56,19 @@ func (s *Server) InitRoutes() {
 	s.router.POST("/reset", func(c *gin.Context) {
 		err := s.cmd.Reset()
 		if err != nil {
-			c.String(http.StatusBadRequest, "Bad Request")
+			c.String(http.StatusInternalServerError, "Internal Server Error")
 			c.Abort()
 			return
 		}
 		s.cmd.Refresh()
+	})
+	s.router.POST("/resend", func(c *gin.Context) {
+		err := s.cmd.Resend()
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Internal Server Error")
+			c.Abort()
+			return
+		}
 	})
 
 	s.router.POST("/angle", func(c *gin.Context) {
@@ -114,7 +122,7 @@ func (s *Server) InitRoutes() {
 				c.Abort()
 				return
 			}
-			s.cmd.Refresh()
+			// s.cmd.Refresh()
 		}
 	})
 }

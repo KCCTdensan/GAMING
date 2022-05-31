@@ -3,6 +3,7 @@ package gaming
 import (
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/tarm/serial"
 )
@@ -26,6 +27,7 @@ func NewSerial(dev string, baud int) Serial {
 func (s *Serial) Print(ch chan []byte) {
 	for b := range ch {
 		s.serial.Write(b)
+		time.Sleep(time.Millisecond * 100)
 	}
 }
 

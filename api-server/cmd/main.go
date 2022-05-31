@@ -30,12 +30,6 @@ func main() {
 		go s.Print(chout)
 		go s.Listen(chin)
 		go s.Parse(&status, chin)
-		// debug
-		go func(){
-			for s := range chin {
-				log.Print(string(s))
-			}
-		}()
 		cmd.Refresh()
 	}
 
