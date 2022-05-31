@@ -4,7 +4,7 @@ import (
 	"flag"
 	"log"
 
-	"api-server/gaming"
+	"api-server"
 )
 
 var (
