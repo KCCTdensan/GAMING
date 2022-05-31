@@ -17,18 +17,18 @@ type Server struct {
 	cmd    *Cmd
 }
 
-var lim = rate.NewLimiter(2.0, 1)
+var lim = rate.NewLimiter(2.0, 10)
 
-func rateLimiter(c *gin.Context) {
-	if c.Request.Method != "GET" && !lim.Allow() {
+func ratelimit(c *gin.Context) (limit bool) {
+	if limit = !lim.Allow(); limit {
 		c.String(http.StatusTooManyRequests, "Too Many Requests")
 		c.Abort()
 	}
+	return
 }
 
 func NewServer(addr string, status *Status, cmd *Cmd) Server {
 	router := gin.New()
-	router.Use(rateLimiter)
 	s := Server{router, addr, status, cmd}
 	s.InitRoutes()
 	return s
@@ -46,10 +46,20 @@ func (s *Server) InitRoutes() {
 	})
 
 	s.router.POST("/suspend", func(c *gin.Context) {
-		s.cmd.Suspend()
+		err := s.cmd.Suspend()
+		if err != nil {
+			c.String(http.StatusBadRequest, "Bad Request")
+			c.Abort()
+			return
+		}
 	})
 	s.router.POST("/reset", func(c *gin.Context) {
-		s.cmd.Reset()
+		err := s.cmd.Reset()
+		if err != nil {
+			c.String(http.StatusBadRequest, "Bad Request")
+			c.Abort()
+			return
+		}
 		s.cmd.Refresh()
 	})
 
@@ -57,34 +67,61 @@ func (s *Server) InitRoutes() {
 		v := c.PostForm("val")
 		n, err := strconv.Atoi(v)
 		if err != nil {
-			c.Status(http.StatusBadRequest)
+			c.String(http.StatusBadRequest, "Bad Request")
+			c.Abort()
 			return
 		}
-		s.cmd.Angle(n)
-		s.cmd.Refresh()
+		if s.status.Angle != n && !ratelimit(c) {
+			err := s.cmd.Angle(n)
+			if err != nil {
+				c.String(http.StatusBadRequest, "Bad Request")
+				c.Abort()
+				return
+			}
+			s.cmd.Refresh()
+		}
 	})
 	s.router.POST("/delay", func(c *gin.Context) {
 		v := c.PostForm("val")
 		n, err := strconv.Atoi(v)
 		if err != nil {
-			c.Status(http.StatusBadRequest)
+			c.String(http.StatusBadRequest, "Bad Request")
+			c.Abort()
 			return
 		}
-		s.cmd.Delay(n)
-		s.cmd.Refresh()
+		if s.status.Delay != n && !ratelimit(c) {
+			err := s.cmd.Delay(n)
+			if err != nil {
+				c.String(http.StatusBadRequest, "Bad Request")
+				c.Abort()
+				return
+			}
+			s.cmd.Refresh()
+		}
 	})
 	s.router.POST("/type", func(c *gin.Context) {
 		v := c.PostForm("val")
 		n, err := strconv.Atoi(v)
 		if err != nil {
-			c.Status(http.StatusBadRequest)
+			c.String(http.StatusBadRequest, "Bad Request")
+			c.Abort()
 			return
 		}
-		s.cmd.Type(n)
-		s.cmd.Refresh()
+		if s.status.Type != n && !ratelimit(c) {
+			err := s.cmd.Type(n)
+			if err != nil {
+				c.String(http.StatusBadRequest, "Bad Request")
+				c.Abort()
+				return
+			}
+			s.cmd.Refresh()
+		}
 	})
 }
 
 func (s *Server) Run() {
-	s.router.Run(s.addr)
+	err := s.router.Run(s.addr)
+	if err != nil {
+		panic(err.Error())
+	}
 }
