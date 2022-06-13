@@ -27,6 +27,11 @@
     get()
     guruguru = false
   }
+
+  const poster = path => async () => {
+    await fetch(path, { method: "post" })
+    await get()
+  }
 </script>
 
 <h1>GAMING</h1>
@@ -54,4 +59,10 @@
     <input type="number" bind:value={delay} on:change={update}>
     <input type="range" bind:value={delay} on:change={update}>
   </label>
+
+  <div>
+    <button on:click={poster("/suspend")}>suspend</button>
+    <button on:click={poster("/resend")}>resend</button>
+    <button on:click={poster("/reset")}>RESET</button>
+  </div>
 {/await}
