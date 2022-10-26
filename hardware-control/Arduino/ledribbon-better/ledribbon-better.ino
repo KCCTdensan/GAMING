@@ -42,19 +42,19 @@ void loop() {
 void system_command() {
   switch (Serial.read()) {
     case 'a':
-      sysdbg_disp("a: edit Angular velocity");
+      sysdbg_disp(F("a: edit Angular velocity"));
       anv = system_compArg();
       break;
     case 'd':
-      sysdbg_disp("d: edit 1Cycle delaylMilliSeconds");
+      sysdbg_disp(F("d: edit 1Cycle delaylMilliSeconds"));
       delaySeconds = system_compArg();
       break;
     case 'c':
-      sysdbg_disp("c: Changes to the specified light pattern.");
+      sysdbg_disp(F("c:  Changes to the specified light pattern.");
       system_change(system_compArg());
       break;
     case 'D':
-      sysdbg_disp("D: Displays all variables");
+      sysdbg_disp(F("D: Displays all variables"));
       system_disp();
       break;
     case 'S':
@@ -62,17 +62,17 @@ void system_command() {
       while (Serial.available() == 0) {
         Serial.read();
       }
-      sysdbg_disp("S: The system operation is now temporarily suspended. To resume, enter S again. In this state, no commands other than S will be accepted.");
+      sysdbg_disp(F("S: The system operation is now temporarily suspended. To resume, enter S again. In this state, no commands other than S will be accepted."));
       while (Serial.read() != 'S') {}
-      sysdbg_disp("S: Resume system operation.\n");
+      sysdbg_disp(F("S: Resume system operation.\n"));
       break;
     case 'R':
-      sysdbg_disp("R: System reset.\n");
+      sysdbg_disp(F("R: System reset.\n"));
       Serial.flush();
       resetFunc();
       break;
     default:
-      sysdbg_disp("Command not found.\n");
+      sysdbg_disp(F("Command not found.\n"));
       break;
   }
   system_cleanBuf();
@@ -99,54 +99,54 @@ void system_change(byte type) {
   switch (type) {
     case 0:
       brightFunc = rainbow_onecycle;
-      sysdbg_disp("c: The light pattern is set to GAMING.");
+      sysdbg_disp(F("c: The light pattern is set to GAMING."));
       break;
     case 1:
       brightFunc = white_onecycle;
-      sysdbg_disp("c: The light pattern is set to white.");
+      sysdbg_disp(F("c: The light pattern is set to white."));
       break;
     case 2:
       brightFunc = daylight_onecycle;
-      sysdbg_disp("c: The light pattern is set to daylight white.");
+      sysdbg_disp(F("c:  The light pattern is set to daylight white."));
       break;
     case 3:
       brightFunc = subdued_onecycle;
-      sysdbg_disp("c: The light pattern is set to subdued white.");
+      sysdbg_disp(F("c:  The light pattern is set to subdued white."));
       break;
     case 4:
       brightFunc = sepia_onecycle;
-      sysdbg_disp("c: The light pattern is set to sepia.");
+      sysdbg_disp(F("c:  The light pattern is set to sepia."));
       break;
     case 5:
       brightFunc = redwave_onecycle;
-      sysdbg_disp("c: The light pattern is set to REDWAVE.");
+      sysdbg_disp(F("c:  The light pattern is set to REDWAVE."));
       break;
     case 6:
       brightFunc = blueshot_onecycle;
-      sysdbg_disp("c: The light pattern is set to BLUESHOT.");
+      sysdbg_disp(F("c:  The light pattern is set to BLUESHOT."));
       break;
     case 7:
       brightFunc = ocean_onecycle;
-      sysdbg_disp("c: The light pattern is set to OCEAN.");
+      sysdbg_disp(F("c:  The light pattern is set to OCEAN."));
       break;
     case 8:
       brightFunc = random_onecycle;
-      sysdbg_disp("c: The light pattern is set to RANDOM.");
+      sysdbg_disp(F("c:  The light pattern is set to RANDOM."));
       break;
     case 9:
       brightFunc = communism_onecycle;
-      sysdbg_disp("c: The light pattern is set to COMMUNISM.");
+      sysdbg_disp(F("c:  The light pattern is set to COMMUNISM."));
       break;
     case 10:
       brightFunc = pinkwave_onecycle;
-      sysdbg_disp("c: The light pattern is set to PINKWAVE.");
+      sysdbg_disp(F("c:  The light pattern is set to PINKWAVE."));
       break;
     case 11:
       brightFunc = dprk_onecycle;
-      sysdbg_disp("c: The light pattern is set to DPRK.");
+      sysdbg_disp(F("c:  The light pattern is set to DPRK."));
       break;
     default:
-      sysdbg_disp("c: Error ! Non-existent specification code.");
+      sysdbg_disp(F("c:  Error ! Non-existent specification code."));
   }
   sysdbg_disp("");
 
@@ -155,11 +155,11 @@ void system_change(byte type) {
 
 void system_disp() {
 #ifdef DBG
-  sysdbg_disp("Angular velocity val: ");
+  sysdbg_disp(F("Angular velocity val: "));
   sysdbg_dispval(anv);
-  sysdbg_disp("1Cycle delayMilliSeconds val: ");
+  sysdbg_disp(F("1Cycle delayMilliSeconds val: "));
   sysdbg_dispval(delaySeconds);
-  sysdbg_disp("All vals are displayed.\n");
+  sysdbg_disp(F("All vals are displayed.\n"));
 #else
   Serial.print(anv);
   Serial.print(",");
@@ -354,12 +354,12 @@ void communism_onecycle() {
 
 void pinkwave_onecycle() {
   system_shiftColors();
-  randomSeed(analogRead(A0)%10);
-  leds[0].r = wave[random(0,256)];
-  randomSeed(analogRead(A0)%10);
-  leds[0].g = wave[random(0,256)];
-  randomSeed(analogRead(A0)%10);
-  leds[0].b = wave[random(0,256)];
+  randomSeed(analogRead(A0) % 10);
+  leds[0].r = wave[random(0, 256)];
+  randomSeed(analogRead(A0) % 10);
+  leds[0].g = wave[random(0, 256)];
+  randomSeed(analogRead(A0) % 10);
+  leds[0].b = wave[random(0, 256)];
   nowAngle += anv;
   delay(delaySeconds);
 
